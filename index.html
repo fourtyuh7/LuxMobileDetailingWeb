@@ -180,9 +180,17 @@ msg.className='msg ok';msg.textContent="Thanks! Your quote request has been rece
 catch(err){msg.className='msg no';msg.textContent='Your request could not be sent. Please try again or call 571-225-1296.';}
 finally{busy=false;sb.disabled=false;sb.textContent='Request My Quote';msg.scrollIntoView({block:'nearest'});}});
 
-const gt=$('gt'),gs=()=>gt.querySelector('.gi').offsetWidth+16;
-$('gp').onclick=()=>gt.scrollBy({left:-gs()*2,behavior:'smooth'});
-$('gn').onclick=()=>gt.scrollBy({left:gs()*2,behavior:'smooth'});
+const gt=$('gt'),gItems=[...gt.querySelectorAll('.gi')];
+const gLeft=el=>el.getBoundingClientRect().left-gt.getBoundingClientRect().left+gt.scrollLeft;
+const gGo=dir=>{
+  const x=gt.scrollLeft;
+  const target=dir>0
+    ? gItems.find(el=>gLeft(el)>x+2)
+    : [...gItems].reverse().find(el=>gLeft(el)<x-2);
+  if(target)gt.scrollTo({left:gLeft(target),behavior:'smooth'});
+};
+$('gp').onclick=()=>gGo(-1);
+$('gn').onclick=()=>gGo(1);
 const gis=[...gt.querySelectorAll('.gi img')],lb=$('lb');let gi=0;
 const show=i=>{gi=(i+gis.length)%gis.length;$('lbi').src=gis[gi].src;$('lbi').alt=gis[gi].alt;};
 gis.forEach((im,i)=>im.parentNode.onclick=()=>{show(i);lb.showModal();});
